@@ -1,55 +1,84 @@
 package com.bridgelabz.HashTable;
 
+import java.util.ArrayList;
+
 public class MyHashTable <K,V> {
 
 
-	MyMapNode head;
-	MyMapNode tail;
+	MyMapNode<K, V> head;
+	MyMapNode<K, V> tail;
+	private int numOfBuckets;
+	ArrayList<MyMapNode<K, V>> myBucketArray;
+
+	public void MyHashMap() {
+		this.numOfBuckets = 10;
+		this.myBucketArray = new ArrayList<MyMapNode<K, V>>(numOfBuckets);
+		// Create empty LinkedLists
+		for (int i = 0; i < numOfBuckets; i++)
+			this.myBucketArray.add(null);
+	}
 
 	/**
-	 * Purpose: Method to get the word from Linked List.
-	 * @param word: word returned.
+	 * Purpose : method to get value from LinkedList using index number
+	 * @param key : key is returned
 	 */
-	public V get(K word) {
-		MyMapNode<K, V> myNode = searchNode(word);
+
+	public V get(K key) {
+		int index = this.getBucketIndex(key);
+		if (this.myBucketArray.get(index) == null)
+			return null;
+		MyMapNode<K, V> myNode = search(key);
 		return (myNode == null) ? null : myNode.getValue();
 	}
 
 	/**
-	 * Purpose: Method to search word from Linked List.
-	 * @param word: word to search.
+	 * Purpose : Method to search the word in LinkedList
+	 * @param key : key to search
 	 */
-	public MyMapNode<K, V> searchNode(K word) {
+
+	public MyMapNode<K, V> search(K key) {
 		MyMapNode<K, V> currentNode = head;
-		int position = 0;
 		while (currentNode != null) {
-			position++;
-			if (currentNode.getKey().equals(word)) {
+			if (currentNode.getKey().equals(key)) {
 				return currentNode;
 			}
 			currentNode = currentNode.getNext();
 		}
+
 		return currentNode;
 	}
 
 	/**
-	 * Purpose: Method to add key and value to hash table.
-	 * @param key: word to be added.
-	 * @param value: frequency of word.
+	 * Purpose : Method to add key and value to hash table
+	 * @param key : word to be added
+	 * @param value: frequency of word
 	 */
 	public void add(K key, V value) {
-		MyMapNode<K, V> myNode = searchNode(key);
+		int index = this.getBucketIndex(key);
+		MyMapNode<K, V> myNode = this.myBucketArray.get(index);
+		if (myNode == null) {
+			myNode = new MyMapNode<K, V>(key, value);
+			this.myBucketArray.set(index, myNode);
+		}
+		myNode = search(key);
 		if (myNode == null) {
 			myNode = new MyMapNode<K, V>(key, value);
 			this.append(myNode);
 		} else
 			myNode.setValue(value);
+	}
+
+	// This implements hash function to find index for a key
+	public int getBucketIndex(K key) {
+		int hashCode = Math.abs(key.hashCode());
+		int index = hashCode % numOfBuckets;
+		return index;
 
 	}
 
 	/**
-	 * Purpose: Method to append value to Linked List.
-	 * @param myNode: value to append.
+	 * Purpose : Method to append value to Linked List
+	 * @param myNode : value to append
 	 */
 
 	private void append(MyMapNode<K, V> myNode) {
@@ -65,6 +94,6 @@ public class MyHashTable <K,V> {
 
 	@Override
 	public String toString() {
-		return "MyLinkedListNodes{" + head + '}';
+		return "MyHashMapNodes{" + head + '}';
 	}
 }
